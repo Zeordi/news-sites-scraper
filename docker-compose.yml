@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  news-scraper-api:
+    build: .
+    container_name: lebanese-news-scraper
+    ports:
+      - "8080:8080"
+    environment:
+      - PYTHONPATH=/app
+      - PORT=8080
+      - SCRAPFLY_API_KEY=${SCRAPFLY_API_KEY:-scp-live-9dd6d7e5783348a2804c11deb989a1a9}
+    volumes:
+      # Mount config for environment variables (optional)
+      - ./config.py:/app/config.py:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - news-scraper-network
+
+networks:
+  news-scraper-network:
+    driver: bridge 
